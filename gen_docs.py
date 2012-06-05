@@ -136,29 +136,26 @@ def bind_function(field):
     Return the appropriate (lambda) function for the given field
     """
     t = field['type']
-    try:
-        if t == 'int':
-            return lambda: random.randint(field['min'], field['max'])
-        elif t == 'float':
-            return lambda: field['min'] + ((field['max'] - field['min']) * random.random())
-        elif t == 'string':
-            return lambda: ''.join(random.choice(string.letters) for i in xrange(random.randint(1, 15))).title()
-        elif t == 'ipsum':
-            return lambda: ipsum(field['lines'])
-        elif t == 'choice':
-            return lambda: random.choice(field['values'])
-        elif t == 'bool':
-            return lambda: bool(random.randint(0,1))
-        elif t == 'name':
-            return lambda: random.choice(names)
-        elif t == 'date':
-            return lambda: randdate(field)
-        else:
-            print 'Unknown field type, exiting'
-            sys.exit(1)
-    except KeyError, k:
-        print k
-        sys.exit(1)
+
+    if t == 'int':
+        return lambda: random.randint(field['min'], field['max'])
+    elif t == 'float':
+        return lambda: field['min'] + ((field['max'] - field['min']) * random.random())
+    elif t == 'string':
+        return lambda: ''.join(random.choice(string.letters) for i in xrange(random.randint(1, 15))).title()
+    elif t == 'ipsum':
+        return lambda: ipsum(field['lines'])
+    elif t == 'choice':
+        return lambda: random.choice(field['values'])
+    elif t == 'bool':
+        return lambda: bool(random.randint(0,1))
+    elif t == 'name':
+        return lambda: random.choice(names)
+    elif t == 'date':
+        return lambda: randdate(field)
+    else:
+        raise KeyError, "Unknown field type %s" % t
+
 
 
 if __name__ == "__main__":
@@ -166,8 +163,12 @@ if __name__ == "__main__":
 
     schema = json.load(open(opts.schema))
     function_schema = {}
-    for field in schema:
-        function_schema[field] = bind_function(schema[field])
+    try:
+        for field in schema:
+            function_schema[field] = bind_function(schema[field])
+    except KeyError, k:
+        print k
+        sys.exit(1)
     docs = []
 
     microcouch = MicroCouch(opts.url)
