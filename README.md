@@ -11,21 +11,34 @@ Copy a subset of documents from one database to another.
 
 Generate realistic random documents based on a schema. Data types are:
 
- * **int** - options: min, max
- * **float** - options: min, max
- * **string** - options: length
- * **ipsum** - options: lines
- * **choice** - options: values (list)
- * **bool** - options: *no options*
- * **name** - options: *no options*
+ * **int**: random integer between `min`/`max` - options: `min`, `max`
+ * **float**: random float between `min`/`max` - options: `min`, `max`
+ * **string**: random string, length <=15 - options: *no options*
+ * **seededstring**: random string, length <=15 appended to `seed` - options: `seed`
+ * **ipsum**: lines of lorem ipsum text - options: `lines`
+ * **choice**: random pick from a list of `values` - options: `values` (list)
+ * **bool**: random `true`/`false` - options: *no options*
+ * **name**: random name chosen from 100 popular names - options: *no options*
+ * **nest**: a nested structure, `value` should be another type (including nest) - options: value
 
 Example schema:
 
     {
         "player": {"type": "name"},
         "score": {"type": "int", "min":0, "max": 1000000},
-        "game": {"type": "choice", "values": ["jetpack george", "mega plumber", "avenue warrior", "space conflict"]}
+        "game": {"type": "choice", "values": ["jetpack george", "mega plumber", "avenue warrior", "space conflict"]},
+        "a": {"type": "nest", "value": {
+          "b": {
+            "type": "nest", "value": {
+              "string": {"type": "string"},
+              "integer": {"max": 1000000, "type": "int", "min": 0}
+            }
+          }
+        }
+      }
     }
+
+Depends on [requests](http://docs.python-requests.org/).
 
 ## microcouch.py
 
