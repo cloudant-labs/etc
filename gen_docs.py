@@ -26,10 +26,10 @@ names = ["Isabella", "Sophia", "Emma", "Olivia", "Ava", "Emily", "Abigail",
          "Isaiah", "Jordan", "Owen", "Carter", "Connor", "Justin"]
 
 
-def gen_doc(schema):
+def gen_doc(schema, counter=0):
     doc = {}
     for field in schema.keys():
-        doc[field] = schema[field]()
+        doc[field] = schema[field](counter)
     return doc
 
 
@@ -169,27 +169,29 @@ def bind_function(field):
     t = field['type']
     try:
         if t == 'int':
-            return lambda: random.randint(field['min'], field['max'])
+            return lambda x: random.randint(field['min'], field['max'])
         elif t == 'float':
-            return lambda: field['min'] + ((field['max'] - field['min']) * random.random())
+            return lambda x: field['min'] + ((field['max'] - field['min']) * random.random())
         elif t == 'string':
-            return lambda: ''.join(random.choice(string.letters) for i in xrange(random.randint(1, 15))).lower()
+            return lambda x: ''.join(random.choice(string.letters) for i in xrange(random.randint(1, 15))).lower()
         elif t == 'seededstring':
-            return lambda: field['seed'] + ''.join(random.choice(string.letters) for i in xrange(random.randint(1, 15))).lower()
+            return lambda x: field['seed'] + ''.join(random.choice(string.letters) for i in xrange(random.randint(1, 15))).lower()
         elif t == 'ipsum':
-            return lambda: ipsum(field['lines'])
+            return lambda x: ipsum(field['lines'])
         elif t == 'choice':
-            return lambda: random.choice(field['values'])
+            return lambda x: random.choice(field['values'])
         elif t == 'bool':
-            return lambda: bool(random.randint(0,1))
+            return lambda x: bool(random.randint(0,1))
         elif t == 'name':
-            return lambda: random.choice(names)
+            return lambda x: random.choice(names)
         elif t == 'date':
-            return lambda: randdate(field)
+            return lambda x: randdate(field)
         elif t == 'fixed':
-            return lambda: field['value']
+            return lambda x: field['value']
         elif t == 'nest':
-            return lambda: nest(field)
+            return lambda x: nest(field)
+        elif t == 'counter':
+            return lambda x: x * field.get("multiplier", 1) + field.get("offset", 0)
         else:
             print 'Unknown field type, exiting'
             sys.exit(1)
@@ -214,8 +216,11 @@ def parse_url(url):
     url = '%s/_bulk_docs' % url
     auth = ()
     netloc = parsed_url.netloc
-    if netloc.index('@') > -1:
-        netloc = netloc.split('@')[1]
+    try:
+        if netloc.index('@') > -1:
+            netloc = netloc.split('@')[1]
+    except:
+        pass
     url = urlunparse([parsed_url.scheme,
                       netloc,
                       parsed_url.path,
@@ -244,15 +249,14 @@ if __name__ == "__main__":
 
     if r.status_code > 220:
         print r.text
-        raise
 
     url = '%s/_bulk_docs' % url
-    print "writing to {}".format(url)
+    print "writing to {0}".format(url)
 
     docs = []
 
     for d in xrange(opts.number):
-        docs.append(gen_doc(function_schema))
+        docs.append(gen_doc(function_schema, d))
         if len(docs) >= opts.batch:
             bulk(url, docs, auth)
             docs = []

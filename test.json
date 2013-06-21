@@ -4,6 +4,8 @@
     "choice": {"type": "choice", "values": ["jetpack george", "mega plumber", "avenue warrior", "space conflict"]},
     "text": {"type": "ipsum", "lines": 5},
     "true": {"type": "bool"},
+    "counter1": {"type": "counter"},
+    "counter2": {"type": "counter", "offset": 10, "multiplier": 5},
     "date1": {"type": "date", "format": "stamp", "end": 1337001781, "start": 413013600},
     "date2": {"type": "date", "format": "stamp", "end": 1337001781, "start": 413013600, "output": "string"},
     "date3": {"type": "date", "format": "string", "end": "December 22, 2012 15:31:48", "start": "December 22, 2002 15:31:48", "output": "stamp"}
