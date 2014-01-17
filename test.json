@@ -8,5 +8,22 @@
     "counter2": {"type": "counter", "offset": 10, "multiplier": 5},
     "date1": {"type": "date", "format": "stamp", "end": 1337001781, "start": 413013600},
     "date2": {"type": "date", "format": "stamp", "end": 1337001781, "start": 413013600, "output": "string"},
-    "date3": {"type": "date", "format": "string", "end": "December 22, 2012 15:31:48", "start": "December 22, 2002 15:31:48", "output": "stamp"}
+    "date3": {"type": "date", "format": "string", "end": "December 22, 2012 15:31:48", "start": "December 22, 2002 15:31:48", "output": "stamp"},
+    "two_level_nest": {
+        "type": "nest", "value": {
+          "b": {
+            "type": "nest", "value": {
+              "string": {"type": "string"},
+              "integer": {"max": 1000000, "type": "int", "min": 0}
+            }
+          }
+        }
+    },
+    "one_level_nest":{
+        "type": "nest",
+        "value": {
+          "string": {"type": "string"},
+          "integer": {"max": 1000000, "type": "int", "min": 0}
+        }
+    }
 }

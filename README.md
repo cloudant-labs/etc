@@ -38,6 +38,8 @@ Example schema:
       }
     }
 
+For a more complete example check out test.json.
+
 Depends on [requests](http://docs.python-requests.org/).
 
 ## microcouch.py

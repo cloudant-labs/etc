@@ -158,7 +158,7 @@ def nest(field):
     obj = {}
     value = field["value"]
     for k, v in value.items():
-        obj[k] = bind_function(v)()
+        obj[k] = bind_function(v)(v)
     return obj
 
 
