@@ -29,7 +29,10 @@ names = ["Isabella", "Sophia", "Emma", "Olivia", "Ava", "Emily", "Abigail",
 def gen_doc(schema, counter=0):
     doc = {}
     for field in schema.keys():
-        doc[field] = schema[field](counter)
+        if field == '_id':
+            doc[field] = str(schema[field](counter))
+        else:
+            doc[field] = schema[field](counter)
     return doc
 
 
