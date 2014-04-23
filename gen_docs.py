@@ -184,7 +184,7 @@ def bind_function(field):
         elif t == 'choice':
             return lambda x: random.choice(field['values'])
         elif t == 'bool':
-            return lambda x: bool(random.randint(0,1))
+            return lambda x: bool(random.randint(0, 1))
         elif t == 'name':
             return lambda x: random.choice(names)
         elif t == 'date':
@@ -236,15 +236,14 @@ def parse_url(url):
     return url, auth
 
 
-if __name__ == "__main__":
-    opts, args = options()
-
-    schema = json.load(open(opts.schema))
+def build_function_schema(schema):
     function_schema = {}
     for field in schema:
         function_schema[field] = bind_function(schema[field])
+    return function_schema
 
-    url, auth = parse_url(opts.url)
+
+def create_db(url, auth):
     # Quickest way to check the db exists and create it if not
     r = requests.put(url,
                      auth=auth,
@@ -255,13 +254,27 @@ if __name__ == "__main__":
 
     url = '%s/_bulk_docs' % url
     print "writing to {0}".format(url)
+    return url
 
+
+def generate_this_many_docs_in_batches(number, batch, url, auth):
     docs = []
 
-    for d in xrange(opts.number):
+    for d in xrange(number):
         docs.append(gen_doc(function_schema, d))
-        if len(docs) >= opts.batch:
+        if len(docs) >= batch:
             bulk(url, docs, auth)
             docs = []
     if len(docs) > 0:
         bulk(url, docs, auth)
+
+
+if __name__ == "__main__":
+    opts, args = options()
+
+    function_schema = build_function_schema(json.load(open(opts.schema)))
+
+    url, auth = parse_url(opts.url)
+    url = create_db(url, auth)
+
+    generate_this_many_docs_in_batches(opts.number, opts.batch, url, auth)
