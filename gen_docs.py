@@ -152,7 +152,10 @@ def randdate(field):
     stamp = random.randint(start, end)
 
     if 'output' not in field.keys() or field['output'] == 'stamp':
-        return stamp
+        if field.get('cast', False):
+            return str(stamp)
+        else:
+            return stamp
     elif field['output'] == 'string':
         return datetime.datetime.fromtimestamp(stamp).strftime(timefmt)
 
@@ -196,7 +199,7 @@ def bind_function(field):
         elif t == 'counter':
             return lambda x: x * field.get("multiplier", 1) + field.get("offset", 0)
         else:
-            print 'Unknown field type, exiting'
+            print 'Unknown field type,' + t + ' exiting'
             sys.exit(1)
     except KeyError, k:
         print k
@@ -211,7 +214,7 @@ def bulk(url, docs, auth):
     if resp.status_code > 250:
         print resp.text
     else:
-        print "%s docs posted" % len(docs)
+        print "%s docs posted in %s" % (len(docs), resp.elapsed)
 
 
 def parse_url(url):
